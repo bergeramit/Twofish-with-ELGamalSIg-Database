@@ -5,7 +5,7 @@ from server_security_utils import (
     get_clients_public_key,
     sign_message_with_el_gamal,
     sign_and_encrypt_reponse,
-    decrypt_message,
+    decrypt_message_in_session,
     convert_encrypted_message_to_string,
     signature_service
 )
@@ -26,7 +26,7 @@ def get_user_encrypted_message():
         raise ValueError("Signature Forged")
     
     print("\n----------------------- Client Signature Validated! -----------------------\n")
-    return decrypt_message(encrypted_user_message).decode().strip()
+    return decrypt_message_in_session(encrypted_user_message, SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT).decode().strip()
 
 def send_to_user(msg):
     print(f"{msg}")
@@ -41,7 +41,7 @@ def send_to_user_encrypted(encrypted_message, signature):
 
 def send_to_user_in_session(msg):
     # In session == already has a twofish key
-    encrypted_message, signature = sign_and_encrypt_reponse(msg)
+    encrypted_message, signature = sign_and_encrypt_reponse(msg, SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT)
     send_to_user_encrypted(encrypted_message, signature)
     test_user.print_encrypted_server_response(encrypted_message, signature)
 
@@ -63,13 +63,14 @@ def main():
     print(f"client's public key to use (e, n) = {user_public_key}")
 
     twofish_key_encrypted_msg = rsa.encrypt(pk=user_public_key, plaintext=SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT)
-    
+    twofish_key_encrypted_msg_string = convert_encrypted_message_to_string(twofish_key_encrypted_msg)
     # El Gamal's implementation expects string and not a list
-    twofish_key_encrypted_msg_signature = sign_message_with_el_gamal(convert_encrypted_message_to_string(twofish_key_encrypted_msg))
+    twofish_key_encrypted_msg_signature = sign_message_with_el_gamal(twofish_key_encrypted_msg_string)
 
     print("\n--------------------- Send Back to User ---------------------")
     print("send the twofish key encrypted with rsa and its signature...")
-    send_to_user_encrypted(twofish_key_encrypted_msg, twofish_key_encrypted_msg_signature)
+    send_to_user_encrypted(twofish_key_encrypted_msg_string, twofish_key_encrypted_msg_signature)
+    test_user.get_first_response_from_server(twofish_key_encrypted_msg_string, twofish_key_encrypted_msg_signature)
 
     # From now on every message between the client and server will be encrypted
     print("\n--------------------- Begin Session Communication with Twofish key ---------------------")
