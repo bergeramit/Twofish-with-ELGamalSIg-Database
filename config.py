@@ -1,10 +1,12 @@
 import hashlib
+import logging
 import time
 import struct
 import rsa
 from client import Client
 
 MENU = '''
+    Welcome to the DataBase. Please select an option:
     [1] for uploading new table entry
     [2] get entry from table
 '''
@@ -20,3 +22,6 @@ def _generate_twofish_symetric_key_object():
     return hashlib.md5(struct.pack(">i", int(time.time()))).hexdigest()
 
 SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT = _generate_twofish_symetric_key_object()
+
+# change to logging.DEBUG to see full detailed implementations
+LOG_LEVEL = logging.INFO

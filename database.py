@@ -1,4 +1,5 @@
 import csv
+import logging
 import os
 
 class Database:
@@ -16,7 +17,7 @@ class Database:
         csvfile.close()
 
     def add_row_to_db(self, row):
-        print(f"Adding new row to db: {row}")
+        logging.info(f"Adding new row to db: {row}")
         with open(self.path_to_db, 'a') as csvfile:
             db_writer = csv.writer(csvfile)
             db_writer.writerow(row)
