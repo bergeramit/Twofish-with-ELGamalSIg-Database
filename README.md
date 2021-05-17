@@ -9,3 +9,18 @@ Databse encryption-decryption with twofish in ECB mode, secret key delivery with
 ## RSA Implemenetation
   Taken from the git repo: https://github.com/Amaterazu7/rsa-python  
  
+## PowerShell steps for pycrypto 2.6.1 (via simple-crypt) / Python 3.6 / Windows 10:
+```
+$env:VCINSTALLDIR="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC"
+$env:CL="-FI`"$env:VCINSTALLDIR\INCLUDE\stdint.h`""
+```
+
+In order to run you need to change line 28 in "Crypto\Random\OSRNG\nt.py"  
+from: 
+```
+import winrandom
+```
+to:  
+```
+from . import winrandom
+```

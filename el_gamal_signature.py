@@ -14,7 +14,7 @@ class ElGamalSig:
         self.p = Crypto.Util.number.getPrime(self.bits, randfunc=Crypto.Random.get_random_bytes)
         self.g = 2
         self.s = randint(0, self.p-1)
-        self.D = int.from_bytes(hashlib.sha256(msg.encode()).digest(),byteorder='big' )
+        self.D = int.from_bytes(hashlib.sha256(msg.encode()).digest(), byteorder='big')
 
     def sign(self):
         e = Crypto.Util.number.getPrime(self.bits, randfunc=Crypto.Random.get_random_bytes)
@@ -30,10 +30,20 @@ class ElGamalSig:
         v = pow(self.g, self.s, self.p)
         v_1 = (pow(v,S_1, self.p) * pow(S_1,S_2,self.p)) % self.p
         v_2 = pow(self.g, self.D, self.p)
-        return v_1 == v_2
+        assert v_1 == v_2
+        return v_1, v_2
 
 
 def test_el_gamal_signature():
     sig = ElGamalSig("Hello")
-    DS = sig.sign()
-    print(f"S_1 = {DS[0]}, S_2 = {DS[1]}")
+    S_1, S_2 = sig.sign()
+    print(f"S_1 = {S_1}, S_2 = {S_2}")
+    print("Checking the signature...")
+
+    v_1, v_2 = sig.verify(S_1, S_2)
+    print(f"S_1 = {v_1}, S_2 = {v_2}")
+    print("Same Same :)")
+
+
+if __name__ == "__main__":
+    test_el_gamal_signature()
