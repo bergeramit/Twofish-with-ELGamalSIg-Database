@@ -1,4 +1,3 @@
-# https://asecuritysite.com/encryption/el_sig
 from Crypto.Util.number import *
 from Crypto import Random
 import Crypto
@@ -7,7 +6,7 @@ import sys
 from random import randint
 import hashlib
 
-class ElGamalSig:
+class ElGamalSignature:
 
     def __init__(self, msg, bits=60):
         self.bits = bits
@@ -35,7 +34,9 @@ class ElGamalSig:
 
 
 def test_el_gamal_signature():
-    sig = ElGamalSig("Hello")
+    msg = "Hello"
+    print(f"Message to sign: {msg}")
+    sig = ElGamalSignature(msg)
     S_1, S_2 = sig.sign()
     print(f"S_1 = {S_1}, S_2 = {S_2}")
     print("Checking the signature...")
