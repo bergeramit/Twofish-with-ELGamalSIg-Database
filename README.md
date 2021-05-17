@@ -13,8 +13,9 @@ Databse encryption-decryption with twofish in ECB mode, secret key delivery with
 ```
 $env:VCINSTALLDIR="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC"
 $env:CL="-FI`"$env:VCINSTALLDIR\INCLUDE\stdint.h`""
+pip install pycrypto
+pip install libnum
 ```
-
 In order to run you need to change line 28 in "Crypto\Random\OSRNG\nt.py"  
 from: 
 ```
@@ -24,3 +25,6 @@ to:
 ```
 from . import winrandom
 ```
+
+## El Gamal Signature Implementation
+  taken from: https://asecuritysite.com/encryption/el_sig
