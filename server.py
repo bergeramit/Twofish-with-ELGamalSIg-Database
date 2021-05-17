@@ -19,13 +19,16 @@ def get_user_encrypted_message():
     return decrypt_user_message(encrypted_user_message).decode().strip()
 
 def send_to_user(msg):
-    print(f"Sending: {msg}")
+    print(f"{msg}")
 
 def send_to_user_encrypted(encrypted_message, signature):
-    print("Sent encrypted message: ")
+    print("\n----------------------- Sent to Client! -----------------------")
+    print("----------------------- Sent encrypted message -----------------------\n")
     send_to_user(encrypted_message)
-    print("Sent signature: ")
+    print("\n----------------------- Sent signature -----------------------\n")
     send_to_user(signature)
+    print("\n----------------------- End: Sent to Client! -----------------------\n")
+
 
 def send_user_options():
     menu = '''
@@ -36,6 +39,10 @@ def send_user_options():
     send_to_user_in_session(menu)
 
 def send_to_user_in_session(msg):
+    print("----------------------- Plaintext response to User in Session -----------------------")
+    print("----------------------- This will not be sent to the client! -----------------------\n")
+    print(msg)
+    print("\n----------------------- End: Plaintext response to User in Session -----------------------\n")
     # In session == already has a twofish key
     encrypted_message, signature = sign_and_encrypt_reponse(msg)
     send_to_user_encrypted(encrypted_message, signature)
@@ -48,17 +55,18 @@ def main():
     db = Database()
 
     username, password = test_user.get_user_credentials()
+    print("\n--------------------- Got Credentials from user ---------------------")
     print(f"username = {username}, password = {password}")
 
     if not authenticate(username, password):
         raise ValueError("Wrong Credentials!")
     
-    print("\n--------------------- Successful Login!---------------------")
-    print("\n--------------------- Generating first response!---------------------")
+    print("--------------------- Successful Login!---------------------")
+    print("--------------------- Generating first response!---------------------\n")
     
     # Successfull login
     user_public_key = get_clients_public_key(username)
-    print(f"user_public_key (e, n) = {user_public_key}")
+    print(f"client's public key to use (e, n) = {user_public_key}")
 
     twofish_key_encrypted_msg = rsa.encrypt(pk=user_public_key, plaintext=SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT)
     
@@ -76,8 +84,8 @@ def main():
     choice = get_user_encrypted_message()
     print(f"Received choice from user: {choice}")
     if choice == "1":
-        id = get_user_encrypted_message()
         name = get_user_encrypted_message()
+        id = get_user_encrypted_message()
         db.add_row_to_db([id, name])
 
     elif choice == "2":

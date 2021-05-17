@@ -19,7 +19,12 @@ class Database:
         with open(self.path_to_db, 'a') as csvfile:
             db_writer = csv.writer(csvfile)
             db_writer.writerow(row)
-
-
+        
+    def get_entry_by_id(self, target_id):
+        with open(self.path_to_db, 'r') as csvfile:
+            db_reader = csv.reader(csvfile)
+            for id, name in db_reader:
+                if id == target_id:
+                    return name
 
 
