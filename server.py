@@ -1,15 +1,21 @@
-from server_security_utils import authenticate, get_clients_public_key
+import binascii
 import hashlib
+from server_security_utils import authenticate, get_clients_public_key, sign_message_with_el_gamal, sign_and_encrypt_reponse
+from el_gamal_signature import ElGamalSignature
+from config import SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT
+import rsa
 
 def get_user_credentials():
     return "amit", "1234"
 
-def send_symetric_key_to_user(twofish_key_encrypted_signed):
-    print(f"Send to user twofish key, encrypted and signed: {twofish_key_encrypted_signed}")
+def send_to_user(msg):
+    print(f"Sending: {msg}")
 
-def send_user_encrypted(msg):
-    encrypted_message = twofish.encrypt(msg, twofish_key)
-    print(f"Send encrypted data to user: {encrypted_message}")
+def send_to_user_encrypted(encrypted_message, signature):
+    print("Sent encrypted message: ")
+    send_to_user(encrypted_message)
+    print("Sent signature: ")
+    send_to_user(signature)
 
 def get_choice_from_user():
     pass
@@ -24,8 +30,13 @@ def send_user_options():
     [1] for uploading new table entry
     [2] get entry from table
     '''
-    print("Send to user:")
-    send_user_encrypted(menu)
+    encrypted_message, signature = sign_and_encrypt_reponse(menu)
+    print("\n----------------------- Sending Menu to User -----------------------")
+    send_to_user_encrypted(encrypted_message, signature)
+
+def print_encrypted_bytes(msg):
+    blob_hex = "-".join([hex(m) for m in msg])
+    print(f"Encrypted blob in hex = {blob_hex}")
 
 def main():
     username, password = get_user_credentials()
@@ -34,18 +45,27 @@ def main():
     if not authenticate(username, password):
         raise ValueError("Wrong Credentials!")
     
-    print("Successful Login!")
+    print("\n--------------------- Successful Login!---------------------")
+    print("\n--------------------- Generating first response!---------------------")
     
     # Successfull login
     user_public_key = get_clients_public_key(username)
     print(f"user_public_key (e, n) = {user_public_key}")
 
-    twofish_key_encrypted = rsa.encrypt(user_public_key, twofish_key)
-    twofish_key_encrypted_signed = el_gamal_signature.sign(twofish_key_encrypted)
-    send_symetric_key_to_user(twofish_key_encrypted_signed)
+    twofish_key_encrypted_msg = rsa.encrypt(pk=user_public_key, plaintext=SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT)
+    
+    # El Gamal's implementation expects string and not a list
+    twofish_key_encrypted_msg_signature = sign_message_with_el_gamal(twofish_key_encrypted_msg)
+
+    print("\n--------------------- Send Back to User ---------------------")
+    print("send the twofish key encrypted with rsa and its signature...")
+    send_to_user_encrypted(twofish_key_encrypted_msg, twofish_key_encrypted_msg_signature)
 
     # From now on every message between the client and server will be encrypted
+    print("\n--------------------- Sending Encrypted message using TwoFish with EL gamal Signature ---------------------")
     send_user_options()
+
+    exit()
     choice = get_user_encrypted_message()
 
     if choice == "1":
