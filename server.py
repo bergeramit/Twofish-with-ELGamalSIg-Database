@@ -1,12 +1,18 @@
 import binascii
 import hashlib
-from server_security_utils import authenticate, get_clients_public_key, sign_message_with_el_gamal, sign_and_encrypt_reponse
+import test_user
+from server_security_utils import (
+    authenticate,
+    get_clients_public_key,
+    sign_message_with_el_gamal,
+    sign_and_encrypt_reponse,
+    decrypt_user_message
+)
+
 from el_gamal_signature import ElGamalSignature
 from config import SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT
 import rsa
 
-def get_user_credentials():
-    return "amit", "1234"
 
 def send_to_user(msg):
     print(f"Sending: {msg}")
@@ -18,12 +24,8 @@ def send_to_user_encrypted(encrypted_message, signature):
     send_to_user(signature)
 
 def get_choice_from_user():
-    pass
-    #return twofish.encrypt("1", twofish_key)
-
-def get_user_encrypted_message():
-    user_encrypted_message = get_choice_from_user()
-    return twofish.decrypt(user_encrypted_message, twofish_key)
+    encrypted_user_choice_message, signature = test_user.get_user_menu_choice_response()
+    return decrypt_user_message(encrypted_user_choice_message).decode().strip()
 
 def send_user_options():
     menu = '''
@@ -39,7 +41,7 @@ def print_encrypted_bytes(msg):
     print(f"Encrypted blob in hex = {blob_hex}")
 
 def main():
-    username, password = get_user_credentials()
+    username, password = test_user.get_user_credentials()
     print(f"username = {username}, password = {password}")
 
     if not authenticate(username, password):
@@ -65,9 +67,9 @@ def main():
     print("\n--------------------- Sending Encrypted message using TwoFish with EL gamal Signature ---------------------")
     send_user_options()
 
+    choice = get_choice_from_user()
+    print(f"Received choice from user: {choice}")
     exit()
-    choice = get_user_encrypted_message()
-
     if choice == "1":
         id = get_user_encrypted_message()
         name = get_user_encrypted_message()

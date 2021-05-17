@@ -34,3 +34,6 @@ def sign_and_encrypt_reponse(msg):
     encrypted_message = TwofishECB(bytes.fromhex(SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT)).encrypt(msg_in_bytes)
     encrypted_message_signature = sign_message_with_el_gamal(list(encrypted_message))
     return encrypted_message, encrypted_message_signature
+
+def decrypt_user_message(msg):
+    return TwofishECB(bytes.fromhex(SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT)).decrypt(msg)
