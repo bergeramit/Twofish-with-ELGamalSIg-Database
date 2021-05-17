@@ -43,6 +43,25 @@ def send_to_user_in_session(msg):
     send_to_user_encrypted(encrypted_message, signature)
     TestUser.print_encrypted_server_response(encrypted_message, signature)
 
+def begin_user_session(db):
+    logging.info("Begin Session Communication with Twofish key ")
+    send_to_user_in_session(MENU)
+    choice = get_user_encrypted_message()
+    logging.info(f"Received choice from user: {choice}")
+
+    if choice == "1":
+        send_to_user_in_session("Enter a name for the db entry")
+        name = get_user_encrypted_message()
+        send_to_user_in_session("Enter id for the db entry")
+        id = get_user_encrypted_message()
+        db.add_row_to_db([id, name])
+
+    elif choice == "2":
+        send_to_user_in_session("Enter id to retrive entry")
+        id = get_user_encrypted_message()
+        name = db.get_entry_by_id(id)
+        send_to_user_in_session(name)
+
 def main():
     db = Database()
 
@@ -71,23 +90,7 @@ def main():
     TestUser.get_first_response_from_server(twofish_key_encrypted_msg_string, twofish_key_encrypted_msg_signature)
 
     # From now on every message between the client and server will be encrypted
-    logging.info("Begin Session Communication with Twofish key ")
-    send_to_user_in_session(MENU)
-    choice = get_user_encrypted_message()
-    logging.info(f"Received choice from user: {choice}")
-
-    if choice == "1":
-        send_to_user_in_session("Enter a name for the db entry")
-        name = get_user_encrypted_message()
-        send_to_user_in_session("Enter id for the db entry")
-        id = get_user_encrypted_message()
-        db.add_row_to_db([id, name])
-
-    elif choice == "2":
-        send_to_user_in_session("Enter id to retrive entry")
-        id = get_user_encrypted_message()
-        name = db.get_entry_by_id(id)
-        send_to_user_in_session(name)
+    begin_user_session(db)
 
 
 if __name__ == "__main__":
