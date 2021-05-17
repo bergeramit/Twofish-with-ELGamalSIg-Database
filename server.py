@@ -1,6 +1,6 @@
 import test_user
 from database import Database
-from server_security_utils import (
+from security_utils import (
     authenticate,
     get_clients_public_key,
     sign_message_with_el_gamal,
@@ -10,13 +10,8 @@ from server_security_utils import (
     signature_service
 )
 
-from config import SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT
+from config import SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT, MENU
 import rsa
-
-MENU = '''
-    [1] for uploading new table entry
-    [2] get entry from table
-'''
 
 def get_user_encrypted_message():
     encrypted_user_message, signature = test_user.get_user_response()

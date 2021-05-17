@@ -1,11 +1,11 @@
 import rsa
 from config import SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT, clients_db
 from twofish.twofish_ecb import TwofishECB
-from server_security_utils import (
+from security_utils import (
     sign_and_encrypt_reponse,
     decrypt_message_in_session,
     signature_service,
-    decrypt_fisrt_message
+    decrypt_first_message
 )
 
 username = ''
@@ -48,5 +48,5 @@ def print_encrypted_server_response(server_response, signature):
 def get_first_response_from_server(server_response, signature):
     global username, twofish_key
     validate_signature_from_server(server_response, signature)
-    twofish_key = decrypt_fisrt_message(server_response, clients_db[username].private_key)
+    twofish_key = decrypt_first_message(server_response, clients_db[username].private_key)
     print(f"\n got key: {twofish_key}")

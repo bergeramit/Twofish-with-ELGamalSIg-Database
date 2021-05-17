@@ -1,4 +1,4 @@
-from config import clients_db, SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT
+from config import clients_db
 from el_gamal_signature import ElGamalSignature
 from twofish.twofish_ecb import TwofishECB
 import rsa
@@ -45,6 +45,6 @@ def decrypt_message_in_session(msg, key):
     encrypted_message = convert_encrypted_string_to_message(msg)
     return TwofishECB(bytes.fromhex(key)).decrypt(encrypted_message)
 
-def decrypt_fisrt_message(msg, private_key):
+def decrypt_first_message(msg, private_key):
     encrypted_message = [int(num) for num in msg.split('-')]
     return rsa.decrypt(private_key, encrypted_message)
