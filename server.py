@@ -1,4 +1,4 @@
-import test_user
+from test_user import TestUser
 import logging
 from database import Database
 from security_utils import (
@@ -17,7 +17,7 @@ import rsa
 logging.basicConfig(format='%(asctime)s  %(message)s', datefmt='%m/%d/%Y  %I:%M:%S %p', level=LOG_LEVEL)
 
 def get_user_encrypted_message():
-    encrypted_user_message, signature = test_user.get_user_response()
+    encrypted_user_message, signature = TestUser.get_user_response()
     
     S_1, S_2 = signature
     if not signature_service.verify(S_1, S_2, encrypted_user_message):
@@ -41,12 +41,12 @@ def send_to_user_in_session(msg):
     # In session == already has a twofish key
     encrypted_message, signature = sign_and_encrypt_reponse(msg, SERVER_TWOFISH_SYMETRIC_KEY_PLAINTEXT)
     send_to_user_encrypted(encrypted_message, signature)
-    test_user.print_encrypted_server_response(encrypted_message, signature)
+    TestUser.print_encrypted_server_response(encrypted_message, signature)
 
 def main():
     db = Database()
 
-    username, password = test_user.get_user_credentials()
+    username, password = TestUser.get_user_credentials()
     logging.info("Got Credentials from user ")
     logging.debug(f"username = {username}, password = {password}")
 
@@ -68,7 +68,7 @@ def main():
     logging.info("Send Twofish key to user")
     logging.debug("send the twofish key encrypted with rsa and its signature...")
     send_to_user_encrypted(twofish_key_encrypted_msg_string, twofish_key_encrypted_msg_signature)
-    test_user.get_first_response_from_server(twofish_key_encrypted_msg_string, twofish_key_encrypted_msg_signature)
+    TestUser.get_first_response_from_server(twofish_key_encrypted_msg_string, twofish_key_encrypted_msg_signature)
 
     # From now on every message between the client and server will be encrypted
     logging.info("Begin Session Communication with Twofish key ")

@@ -9,47 +9,52 @@ from security_utils import (
     decrypt_first_message
 )
 
-username = ''
-twofish_key = ''
+class TestUser:
+    USERNAME = ''
+    TWOFISH_KEY = ''
 
-def get_user_response():
-    global twofish_key
-    logging.info("Client Side")
-    response = input("Respond with:")
-    encrypted_message, encrypted_message_signature = sign_and_encrypt_reponse(response, twofish_key)
-    logging.info("End: Client Side")
-    return encrypted_message, encrypted_message_signature
+    @classmethod
+    def get_user_response(cls):
+        global twofish_key
+        logging.info("Client Side")
+        response = input("Respond with:")
+        encrypted_message, encrypted_message_signature = sign_and_encrypt_reponse(response, cls.TWOFISH_KEY)
+        logging.info("End: Client Side")
+        return encrypted_message, encrypted_message_signature
 
-def get_user_credentials():
-    global username
-    logging.info("Client Side")
-    logging.info("Enter Credentials")
-    username = input("Username:")
-    password = input("Password:")
-    logging.info("End: Client Side")
-    return username, password
+    @classmethod
+    def get_user_credentials(cls):
+        global username
+        logging.info("Client Side")
+        logging.info("Enter Credentials")
+        cls.USERNAME = input("Username:")
+        password = input("Password:")
+        logging.info("End: Client Side")
+        return cls.USERNAME, password
 
-def validate_signature_from_server(server_response, signature):
-    S_1, S_2 = signature
-    if not signature_service.verify(S_1, S_2, server_response):
-        raise ValueError("Signature Forged")
-    logging.debug("Signature from Server: Validated")
+    @classmethod
+    def validate_signature_from_server(cls, server_response, signature):
+        S_1, S_2 = signature
+        if not signature_service.verify(S_1, S_2, server_response):
+            raise ValueError("Signature Forged")
+        logging.debug("Signature from Server: Validated")
 
+    @classmethod
+    def print_encrypted_server_response(cls, server_response, signature):
+        global twofish_key
+        cls.validate_signature_from_server(server_response, signature)
+        plain_response = decrypt_message_in_session(server_response, cls.TWOFISH_KEY)
+        logging.info("Client Side")
+        logging.info("Got Response from Server")
+        logging.debug("Decrypted Response")
+        logging.info(plain_response.strip())
+        logging.info("End: Client Side")
 
-def print_encrypted_server_response(server_response, signature):
-    global twofish_key
-    validate_signature_from_server(server_response, signature)
-    plain_response = decrypt_message_in_session(server_response, twofish_key)
-    logging.info("Client Side")
-    logging.info("Got Response from Server")
-    logging.debug("Decrypted Response")
-    logging.info(plain_response.strip())
-    logging.info("End: Client Side")
-
-def get_first_response_from_server(server_response, signature):
-    global username, twofish_key
-    logging.info("Client Side")
-    validate_signature_from_server(server_response, signature)
-    twofish_key = decrypt_first_message(server_response, clients_db[username].private_key)
-    logging.debug(f"Got Twofish key: {twofish_key}")
-    logging.info("End: Client Side")
+    @classmethod
+    def get_first_response_from_server(cls, server_response, signature):
+        global username, twofish_key
+        logging.info("Client Side")
+        cls.validate_signature_from_server(server_response, signature)
+        cls.TWOFISH_KEY = decrypt_first_message(server_response, clients_db[cls.USERNAME].private_key)
+        logging.debug(f"Got Twofish key: {cls.TWOFISH_KEY}")
+        logging.info("End: Client Side")
